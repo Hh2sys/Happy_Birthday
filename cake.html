@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Birthday Surprise</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  background:#111;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  font-family:'Poppins', sans-serif;
+  overflow:hidden;
+  flex-direction:column;
+  color:white;
+}
+.cake{
+  position:relative;
+  width:200px;
+  display:flex;
+  flex-direction:column-reverse;
+  align-items:center;
+}
+.layer{
+  width:200px;
+  height:50px;
+  background:#ff8fab;
+  margin-top:5px;
+  border-radius:10px;
+  opacity:0;
+  transform:translateY(-100px);
+  transition:1s;
+}
+.layer:nth-child(2){width:160px;background:#ffb3c6;}
+.layer:nth-child(3){width:120px;background:#ffc2d1;}
+.frosting{
+  width:120px;
+  height:15px;
+  background:#fff;
+  border-radius:10px;
+  position:absolute;
+  top:-20px;
+  opacity:0;
+  transition:1s;
+}
+.candle{
+  width:10px;
+  height:40px;
+  background:#fff;
+  position:absolute;
+  top:-60px;
+  opacity:0;
+  transition:1s;
+}
+.flame{
+  width:15px;
+  height:20px;
+  background:orange;
+  border-radius:50% 50% 50% 50%;
+  position:absolute;
+  top:-80px;
+  cursor:pointer;
+  animation:flicker 0.2s infinite alternate;
+  opacity:0;
+  transition:0.5s;
+}
+@keyframes flicker{
+  from{transform:scale(1);}
+  to{transform:scale(1.1);}
+}
+button{
+  margin-top:30px;
+  padding:10px 20px;
+  font-size:16px;
+  cursor:pointer;
+  font-family: 'Playfair Display', serif;
+}
+#messageBox{
+  position:absolute;
+  background:rgb(210, 207, 202);
+  color:black;
+  padding:20px;
+  width:300px;
+  text-align:center;
+  border-radius:10px;
+  display:none;
+  font-family: 'Playfair Display', serif;
+}
+#confetti{
+  position:absolute;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
+.smoke{
+  position:absolute;
+  top:-80px;
+  width:15px;
+  height:15px;
+  background:gray;
+  border-radius:50%;
+  animation:smokeUp 2s forwards;
+}
+@keyframes smokeUp{
+  from{opacity:1;transform:translateY(0);}
+  to{opacity:0;transform:translateY(-60px);}
+}
+#textLine{
+  margin-top: 40px;
+}
+
+</style>
+</head>
+<body>
+
+<canvas id="confetti"></canvas>
+
+<div class="cake">
+  <div class="layer"></div>
+  <div class="layer"></div>
+  <div class="layer"></div>
+  <div class="frosting"></div>
+  <div class="candle"></div>
+  <div class="flame"></div>
+</div>
+
+<button id="mainBtn">press</button>
+<div id="textLine"></div>
+
+<div id="messageBox">
+  <p>Happy Birthday 🎂<br>Wishing you a year full of wins✨
+I wish you the best always ya "كووكييي"❤️
+You are so special and amazing and I'm so happy to have you in my life! </p>
+  <p style="margin-top:15px;">Did u finish reading?</p>
+  <button onclick="closeBox()">yes</button>
+</div>
+
+<script>
+const layers=document.querySelectorAll(".layer");
+const frosting=document.querySelector(".frosting");
+const candle=document.querySelector(".candle");
+const flame=document.querySelector(".flame");
+const btn=document.getElementById("mainBtn");
+const box=document.getElementById("messageBox");
+const textLine=document.getElementById("textLine");
+let clickCount=0;
+
+// assemble cake automatically
+window.onload=()=>{
+  layers.forEach((layer,i)=>{
+    setTimeout(()=>{
+      layer.style.opacity=1;
+      layer.style.transform="translateY(0)";
+    },i*800);
+  });
+  setTimeout(()=>{frosting.style.opacity=1;},2500);
+  setTimeout(()=>{candle.style.opacity=1;},3300);
+  setTimeout(()=>{flame.style.opacity=1;},4000);
+};
+
+btn.onclick=()=>{
+  clickCount++;
+  if(clickCount===1){
+    btn.textContent="press again";
+  }else if(clickCount===2){
+    btn.textContent="press again hehe";
+  }else if(clickCount===3){
+    box.style.display="block";
+    btn.style.display="none";
+  }
+};
+
+function closeBox(){
+  box.style.display="none";
+  textLine.textContent="blow your candle by pressing the fire on the candle";
+}
+
+flame.onclick = () => {
+  flame.style.opacity = 0;
+
+  // create smoke
+  const smoke = document.createElement("div");
+  smoke.className = "smoke";
+  document.querySelector(".cake").appendChild(smoke);
+
+  // play music
+  const music = document.getElementById("birthdayMusic");
+  music.volume = 0.5;
+  music.play().catch(err => console.log("Playback failed:", err));
+
+  // start confetti
+  startConfetti();
+};
+
+
+function startConfetti(){
+  const canvas=document.getElementById("confetti");
+  const ctx=canvas.getContext("2d");
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+  const pieces=[];
+  for(let i=0;i<150;i++){
+    pieces.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      r:Math.random()*6+4,
+      d:Math.random()*100
+    });
+  }
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle="hsl("+Math.random()*360+",100%,50%)";
+    pieces.forEach(p=>{
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2,true);
+      ctx.fill();
+      p.y+=2;
+      if(p.y>canvas.height)p.y=0;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+</script>
+<audio id="birthdayMusic" src="birthday.mp3" preload="auto"></audio>
+
+
+</body>
+</html>
